@@ -4,7 +4,7 @@ node ('docker') {
     docker.withRegistry(env.DOCKER_REGISTRY, 'labregistry') {
 
         def customImage = docker.build("demouser/appimage:${BUILD_NUMBER}")
-        stage('Run Aqua Scan'){
+        stage('Run Aqua Scan') {
             def buildResult = 'success'
             echo 'Running Aqua Scan'
             try {
@@ -18,4 +18,5 @@ node ('docker') {
             }
        }
        customImage.push()
+       }
 }
