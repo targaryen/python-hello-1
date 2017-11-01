@@ -20,7 +20,8 @@ node ('docker') {
 
        stage("Push image to registry") {
             customImage.push()
-            sh 'curl -X POST -u ${AQUA_USER}:${AQUA_PASSWORD} ${AQUA_HOST}/api/v1/scanner/registry/lab/image/demouser/appimage:${BUILD_NUMBER}/scan'
+            withCredentials([usernameColonPassword(credentialsId: 'aquascanner', variable: 'USERPASS')])
+            sh 'curl -X POST -u ${USERPASS} ${AQUA_HOST}/api/v1/scanner/registry/lab/image/demouser/appimage:${BUILD_NUMBER}/scan'
 
        }
 
