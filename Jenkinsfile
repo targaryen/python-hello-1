@@ -8,7 +8,13 @@ node ('docker') {
             def buildResult = 'success'
             echo 'Running Aqua Scan'
             try {
-                sh '/usr/bin/docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v '+env.WORKSPACE+':/reports ${AQUA_SCANNER_IMAGE} --local --image demouser/appimage:${BUILD_NUMBER} --host ${AQUA_HOST} --user ${AQUA_USER} --password ${AQUA_PASSWORD} --htmlfile /reports/aqua-scan.html'
+
+                withCredentials([usernamePassword(credentialsId: 'aquascanner', passwordVariable: 'SCANNERPASS', usernameVariable: 'SCANNERUSER')]) {
+                    sh '/usr/bin/docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v '+env.WORKSPACE+':/reports ${AQUA_SCANNER_IMAGE} --local --image demouser/appimage:${BUILD_NUMBER} --host ${AQUA_HOST} --user $SCANNERUSER --password $SCANNERPASS --htmlfile /reports/aqua-scan.html'
+                }
+
+
+
             } catch(e) {
                 buildResult = 'failure'
                 currentBuild.result = buildResult
