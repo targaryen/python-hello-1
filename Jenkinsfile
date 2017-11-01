@@ -1,31 +1,20 @@
 node {
-        stage("Main build") {
+    checkout scm
 
-            checkout scm
+    def customImage = docker.build("image:${env.BUILD_ID}")
 
-            docker.image('ruby:2.3.1').inside {
-
-              stage("Install Bundler") {
-                sh "gem install bundler --no-rdoc --no-ri"
-              }
-
-              stage("Use Bundler to install dependencies") {
-                sh "bundle install"
-              }
-
-              stage("Build package") {
-                sh "bundle exec rake build:deb"
-              }
-
-              stage("Archive package") {
-                archive (includes: 'pkg/*.deb')
-              }
-
-           }
-
+    stage('Run Aqua Scan'){
+        def buildResult = 'success'
+        echo 'Running Aqua Scan'
+        try{
+            sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v '+env.WORKSPACE+':/reports registry.devopslab.co:5000 --local -image image_to_scan:tag --host ${AQUA_SERVER_URL} --user ${AQUA_USER} --password ${AQUA_PASS} --htmlfile /reports/aqua-scan.html'
+        }catch(e){
+            buildResult = 'failure'
+            currentBuild.result = buildResult
+            error("Build failed due to high vulnerability on image")
+       } finally {
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: './', reportFiles: 'aqua-scan.html', reportName: 'Aqua Scan Results'])
         }
-
-        // Clean up workspace
-        step([$class: 'WsCleanup'])
+    }
 
 }
