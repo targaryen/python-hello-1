@@ -1,4 +1,4 @@
-node {
+node ('docker') {
     checkout scm
 
     docker.withRegistry(env.DOCKER_REGISTRY, 'labregistry') {
