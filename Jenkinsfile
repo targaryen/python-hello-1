@@ -4,17 +4,13 @@ node ('docker') {
     docker.withRegistry(env.DOCKER_REGISTRY, 'labregistry') {
 
         def customImage = docker.build("demouser/appimage:${BUILD_NUMBER}")
-        stage('Run Aqua Scan') {
+        stage('Scan image with Aqua') {
             def buildResult = 'success'
             echo 'Running Aqua Scan'
             try {
-
                 withCredentials([usernamePassword(credentialsId: 'aquascanner', passwordVariable: 'SCANNERPASS', usernameVariable: 'SCANNERUSER')]) {
                     sh '/usr/bin/docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v '+env.WORKSPACE+':/reports ${AQUA_SCANNER_IMAGE} --local --image demouser/appimage:${BUILD_NUMBER} --host ${AQUA_HOST} --user $SCANNERUSER --password $SCANNERPASS --htmlfile /reports/aqua-scan.html'
                 }
-
-
-
             } catch(e) {
                 buildResult = 'failure'
                 currentBuild.result = buildResult
@@ -27,10 +23,8 @@ node ('docker') {
        stage("Push image to registry") {
             customImage.push()
             withCredentials([usernameColonPassword(credentialsId: 'aquascanner', variable: 'USERPASS')]) {
-            sh 'curl -X POST -u $USERPASS ${AQUA_HOST}/api/v1/scanner/registry/lab/image/demouser/appimage:${BUILD_NUMBER}/scan'
+                sh 'curl -X POST -u $USERPASS ${AQUA_HOST}/api/v1/scanner/registry/$AQUA_REGISTRY/image/demouser/appimage:${BUILD_NUMBER}/scan'
             }
        }
-
-
        }
 }
