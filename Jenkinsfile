@@ -1,7 +1,7 @@
 node {
     checkout scm
 
-    docker.withRegistry(${DOCKER_REGISTRY}, 'labregistry') {
+    docker.withRegistry(${env.DOCKER_REGISTRY}, 'labregistry') {
 
         def customImage = docker.build("demouser/appimage:${BUILD_NUMBER}")
             stage('Run Aqua Scan'){
