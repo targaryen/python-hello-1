@@ -6,7 +6,7 @@ node ('docker') {
 
     }
     stage('Scan image with Aqua') {
-        aqua locationType: 'local', localImage: 'alpine', hideBase: false,  notCompliesCmd: '', onDisallowed: 'fail', showNegligible: false
+        aqua locationType: 'local', localImage: 'demouser/appimage:${BUILD_NUMBER}', hideBase: false,  notCompliesCmd: '', onDisallowed: 'fail', showNegligible: false
     }
 
 
