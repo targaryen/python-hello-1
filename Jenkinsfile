@@ -1,6 +1,16 @@
 node ('docker') {
     checkout scm
 
+    stage('Build image') {
+        def customImage = docker.build("demouser/appimage:${BUILD_NUMBER}")
+
+    }
+    stage('Scan image with Aqua') {
+        aqua locationType: 'local', localImage: 'alpine', hideBase: false,  notCompliesCmd: '', onDisallowed: 'fail', showNegligible: false
+    }
+
+
+    /*
     docker.withRegistry(env.DOCKER_REGISTRY, 'labregistry') {
 
         def customImage = docker.build("demouser/appimage:${BUILD_NUMBER}")
@@ -20,11 +30,13 @@ node ('docker') {
             }
        }
 
+
        stage("Push image to registry") {
             customImage.push()
             withCredentials([usernameColonPassword(credentialsId: 'aquascanner', variable: 'USERPASS')]) {
                 sh 'curl -X POST -u $USERPASS ${AQUA_HOST}/api/v1/scanner/registry/$AQUA_REGISTRY/image/demouser/appimage:${BUILD_NUMBER}/scan'
             }
        }
-       }
+    }
+    */
 }
