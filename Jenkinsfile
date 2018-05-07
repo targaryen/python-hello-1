@@ -4,7 +4,7 @@ node ('docker') {
 
     stage('Build image one') {
         // image one
-        dir("${workspace}/one")
+        dir("${env.WORKSPACE}/one")
         def customImageOne = docker.build("demouser/appimageone:${BUILD_NUMBER}")
     }
 
@@ -15,7 +15,7 @@ node ('docker') {
 
     stage('Build image two') {
         // image two
-        dir("${workspace}/two")
+        dir("${env.WORKSPACE}/two")
         def customImageTwo = docker.build("demouser/appimagetwo:${BUILD_NUMBER}")
     }
 
