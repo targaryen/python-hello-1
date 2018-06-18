@@ -2,15 +2,15 @@ node ('docker') {
     checkout scm
     def workspace = pwd()
 
-    stage('Build image one') {
+//  stage('Build image one') {
         // image one
-        dir("${env.WORKSPACE}/dockerfiles/one") {
-        def customImageOne = docker.build("demouser/appimageone:${BUILD_NUMBER}")
-        }
-    }
+//        dir("${env.WORKSPACE}/dockerfiles/one") {
+//        def customImageOne = docker.build("demouser/appimageone:${BUILD_NUMBER}")
+//        }
+//    }
 
     stage('Scan image with Aqua') {
-        aqua locationType: 'local', localImage: 'demouser/appimageone:${BUILD_NUMBER}', hideBase: false,  notCompliesCmd: '', onDisallowed: 'fail', showNegligible: false
+        aqua locationType: 'hosted', registry: 'Docker Hub', hostedImage: 'nginx:latest',  notCompliesCmd: '', onDisallowed: 'ignore', hideBase: false, showNegligible: false
     }
 
 
